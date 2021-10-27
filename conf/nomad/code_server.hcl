@@ -141,15 +141,25 @@ job "${job_name}" {
       # are specific to each driver, so please see specific driver
       # documentation for more information.
       config {
-        image        = "${image}"
-        dns_servers  = [
+        image       = "${image}"
+        dns_servers = [
           "172.17.0.1"
         ]
-        network_mode = "host"
         port_map {
-          http       = ${port_static}
+          https     = ${port_static}
         }
-        privileged   = false
+        privileged  = false
+        volumes     = [
+          "secrets/config.yaml:/home/coder/.config/code-server/config.yaml",
+          "secrets/settings.json:/home/coder/.local/share/code-server/User/settings.json",
+          "secrets/rclone.json:/tmp/rclone-tasks.json"
+        ]
+      }
+
+      # The env stanza configures a list of environment variables to populate
+      # the task's environment before starting.
+      env {
+        ${ envs }
       }
 
       # The service stanza instructs Nomad to register a service with Consul.
@@ -157,9 +167,94 @@ job "${job_name}" {
       #     https://www.nomadproject.io/docs/job-specification/service
       #
       service {
-        name       = "${service_name}"
-        port       = "http"
-        tags       = [ "${service_name}$${NOMAD_ALLOC_INDEX}" ]
+        name = "${service_name}"
+        port = "https"
+        tags = [ "${service_name}$${NOMAD_ALLOC_INDEX}" ]
+      }
+
+      # The "template" stanza instructs Nomad to manage a template, such as
+      # a configuration file or script. This template can optionally pull data
+      # from Consul or Vault to populate runtime configuration data.
+      #
+      # For more information and examples on the "template" stanza, please see
+      # the online documentation at:
+      #
+      #     https://www.nomadproject.io/docs/job-specification/template
+      #
+      template {
+        change_mode   = "noop"
+        change_signal = "SIGINT"
+        destination   = "secrets/config.yaml"
+        data          = <<EOH
+auth: password
+password: ${password}
+cert: ${cert}
+EOH
+      }
+      
+      template {
+        change_mode   = "noop"
+        change_signal = "SIGINT"
+        destination   = "secrets/settings.json"
+        data          = <<EOH
+{
+    "workbench.colorTheme": "SynthWave '84",
+    "workbench.iconTheme": "vs-minimal",
+    "editor.fontSize": 12,
+    "files.autoSave": "off",
+    "files.trimTrailingWhitespace": true,
+    "workbench.startupEditor": "none",
+    "gitlens.codeLens.enabled": false,
+    "editor.minimap.enabled": false,
+    "editor.rulers": [
+        80
+    ],
+    "sync.gist": "d23b346a1979446aac26dece5c983386",
+    "sync.autoDownload": true,
+    "sync.autoUpload": true
+}
+EOH
+      }
+      
+      template {
+        change_mode   = "noop"
+        change_signal = "SIGINT"
+        destination   = "secrets/rclone.json"
+        data          = <<EOH
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "push_remote",
+        "type": "shell",
+        "command": "sh /home/coder/push_remote.sh",
+        "presentation": {
+          "reveal": "always"
+        },
+        "problemMatcher": [],
+        "options": {
+          "statusbar": {
+            "label": "$(repo-push) rclone: push"
+          }
+        }
+      },
+      {
+        "label": "pull_remote",
+        "type": "shell",
+        "command": "sh /home/coder/pull_remote.sh",
+        "presentation": {
+          "reveal": "always"
+        },
+        "problemMatcher": [],
+        "options": {
+          "statusbar": {
+            "label": "$(repo-pull) rclone: pull"
+          }
+        }
+      }
+    ]
+}
+EOH
       }
 
       # The "resources" stanza describes the requirements a task needs to
@@ -173,16 +268,16 @@ job "${job_name}" {
         cpu        = ${cpu}
         memory     = ${memory}
         # The network stanza specifies the networking requirements for the task
-        # group, including the network mode and port allocations. When scheduling
-        # jobs in Nomad they are provisioned across your fleet of machines along
-        # with other jobs and services. Because you don't know in advance what host
-        # your job will be provisioned on, Nomad will provide your tasks with
-        # network configuration when they start up.
+        # group, including the network mode and port allocations. When
+        # scheduling jobs in Nomad they are provisioned across your fleet of
+        # machines along with other jobs and services. Because you don't know in
+        # advance what host your job will be provisioned on, Nomad will provide
+        # your tasks with network configuration when they start up.
         #
         #     https://www.nomadproject.io/docs/job-specification/network
         #
         network {
-          port "http" {
+          port "https" {
             static = ${port_static}
           }
         }

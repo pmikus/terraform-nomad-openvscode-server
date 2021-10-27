@@ -1,8 +1,8 @@
 <!-- markdownlint-disable MD041 -->
 
-# Terraform-nomad-openvscode-server
-Terraform-nomad-miopenvscode-servernio module is IaaC - infrastructure as a
-code. Module contains a nomad job with [OpenVSCode](https://www.gitpod.io).
+# Terraform-nomad-code-server
+Terraform-nomad-code-server module is IaaC - infrastructure as a
+code. Module contains a nomad job with [Code Server](https://www.gitpod.io).
 - [consul](https://www.consul.io/docs/) service integration.
 - [docker driver](https://www.nomadproject.io/docs/drivers/docker.html)
 
@@ -26,7 +26,7 @@ No modules required.
   port.
 
 ## Usage
-The following command will run an example with standalone instance of OpenVSCode
+The following command will run an example with standalone instance of Code
 Server.
 
 ```text
@@ -36,14 +36,14 @@ terraform apply
 ```
 
 ### Verifying setup
-You can verify that OpenVSCode Server ran successful by checking the OpenVSCode
-Server UI on [localhost:3000/](http://localhost:3000/).
+You can verify that Code Server ran successful by checking the Code
+Server UI on [localhost:3000/](https://localhost:3000/).
 
 ## Example usage
-These are the default values for the OpenVSCode Server module.
+These are the default values for the Code Server module.
 
 ```hcl
-module "openvscode" {
+module "code_server" {
   source = "../.."
 
   # nomad
@@ -51,11 +51,11 @@ module "openvscode" {
   nomad_namespace    = "default"
   nomad_host_volume  = "persistence"
 
-  # openvscode
-  service_name       = "openvscode"
+  # code-server
+  service_name       = "code-server"
   host               = "127.0.0.1"
   port_static        = 3000
-  image              = "gitpod/openvscode-server"
+  image              = "pmikus/docker-code-server-base:latest"
   volume_destination = "/home/workspace"
   use_host_volume    = true
   use_canary         = true
@@ -66,5 +66,6 @@ module "openvscode" {
 ## Volumes
 We are using
 [host volume](https://www.nomadproject.io/docs/job-specification/volume) to
-store OpenVSCode data. OpenVSCode data will now be available in the
-`persistence/OpenVSCode` folder.
+store Code Server data. Code Server data will now be available in the
+`/home/workspace` folder.
+

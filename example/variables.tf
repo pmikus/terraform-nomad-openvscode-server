@@ -27,3 +27,4 @@ variable "nomad_provider_key_file" {
   type        = string
   default     = "/etc/nomad.d/ssl/nomad-cli-key.pem"
 }
+

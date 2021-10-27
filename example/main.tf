@@ -5,7 +5,7 @@
 # and have them automatically associated with the root provider
 # configurations.
 
-module "openvscode" {
+module "code_server" {
   source = "../"
   providers = {
     nomad = nomad.vagrant
@@ -15,19 +15,21 @@ module "openvscode" {
   datacenters   = ["vagrant"]
   volume_source = "volume-glacier1-1"
 
-  # openvscode
-  job_name     = "openvscode"
-  group_count  = 1
-  service_name = "openvscode"
-  host         = "http://10.0.2.15"
-  port         = 3000
-  image        = "gitpod/openvscode-server"
+  # code-server
+  cert            = true
+  image           = "pmikus/docker-code-server-base:v3.12.0"
+  job_name        = "code-server"
+  group_count     = 1
+  password        = "28cc31eb07175f727e155ec8"
+  port_static     = 8443
+  service_name    = "coder"
+  use_host_volume = true
+  use_canary      = true
   vault_secret = {
-    use_vault_provider        = false,
-    vault_kv_policy_name      = "kv-secret",
-    vault_kv_path             = "secret/data/openvscode"
+    use_vault_provider   = false,
+    vault_kv_policy_name = "kv-secret",
+    vault_kv_path        = "secret/data/coder"
   }
-  volume_destination = "/home/workspace/"
-  use_host_volume    = false
-  use_canary         = true
+  volume_destination = "/home/coder/"
 }
+

@@ -4,12 +4,13 @@ locals {
   upstreams   = jsonencode(var.upstreams)
 }
 
-data "template_file" "nomad_job_openvscode" {
-  template = file("${path.module}/conf/nomad/openvscode.hcl")
+data "template_file" "nomad_job_code_server" {
+  template = file("${path.module}/conf/nomad/code_server.hcl")
   vars = {
     auto_promote              = var.auto_promote
     auto_revert               = var.auto_revert
     canary                    = var.canary
+    cert                      = var.cert
     cpu                       = var.cpu
     cpu_proxy                 = var.resource_proxy.cpu
     datacenters               = local.datacenters
@@ -21,7 +22,7 @@ data "template_file" "nomad_job_openvscode" {
     max_parallel              = var.max_parallel
     memory                    = var.memory
     memory_proxy              = var.resource_proxy.memory
-    port                      = var.port
+    password                  = var.password
     port_static               = var.port_static
     region                    = var.region
     service_name              = var.service_name
@@ -40,7 +41,7 @@ data "template_file" "nomad_job_openvscode" {
   }
 }
 
-resource "nomad_job" "nomad_job_openvscode" {
-  jobspec = data.template_file.nomad_job_openvscode.rendered
+resource "nomad_job" "nomad_job_code_server" {
+  jobspec = data.template_file.nomad_job_code_server.rendered
   detach  = false
 }

@@ -18,7 +18,7 @@ variable "volume_source" {
   default     = "persistence"
 }
 
-# OpenVSCode Server
+# Code Server
 variable "auto_promote" {
   description = "Specifies if the job should auto-promote to the canary version"
   type        = bool
@@ -37,6 +37,12 @@ variable "canary" {
   default     = 1
 }
 
+variable "cert" {
+  description = "Use certificate for Code Server"
+  type        = bool
+  default     = true
+}
+
 variable "cpu" {
   description = "Specifies the CPU required to run this task in MHz"
   type        = number
@@ -44,7 +50,7 @@ variable "cpu" {
 }
 
 variable "envs" {
-  description = "OpenVSCode environment variables"
+  description = "Code Server environment variables"
   type        = list(string)
   default     = []
 }
@@ -56,7 +62,7 @@ variable "group_count" {
 }
 
 variable "host" {
-  description = "OpenVSCode host"
+  description = "Code Server host"
   type        = string
   default     = "127.0.0.1"
 }
@@ -64,13 +70,13 @@ variable "host" {
 variable "image" {
   description = "The Docker image to run"
   type        = string
-  default     = "gitpod/openvscode-server"
+  default     = "pmikus/docker-code-server-base:v3.12.0"
 }
 
 variable "job_name" {
   description = "Specifies a name for the job"
   type        = string
-  default     = "openvscode"
+  default     = "code-server"
 }
 
 variable "kms_variables" {
@@ -101,20 +107,21 @@ variable "memory" {
   default     = 1024
 }
 
-variable "port" {
-  description = "Specifies a TCP/UDP port allocation"
+variable "password" {
+  description = "Code Server password"
   type        = string
-  default     = "http"
+  default     = "28cc31eb07175f727e155ec8"
+  sensitive   = true
 }
 
 variable "port_static" {
   description = "Specifies the static TCP/UDP port to allocate"
   type        = number
-  default     = 3000
+  default     = 8443
 }
 
 variable "resource_proxy" {
-  description = "OpenVSCode Server proxy resources"
+  description = "Code Server proxy resources"
   type = object({
     cpu    = number,
     memory = number
@@ -132,7 +139,7 @@ variable "resource_proxy" {
 variable "service_name" {
   description = "Specifies the name this service will be advertised in Consul"
   type        = string
-  default     = "openvscode"
+  default     = "coder"
 }
 
 variable "upstreams" {
@@ -145,7 +152,7 @@ variable "upstreams" {
 }
 
 variable "use_canary" {
-  description = "Uses canary deployment for OpenVSCode server"
+  description = "Uses canary deployment for Code Server"
   type        = bool
   default     = false
 }
@@ -153,7 +160,7 @@ variable "use_canary" {
 variable "use_host_volume" {
   description = "Use Nomad host volume feature"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "vault_secret" {
@@ -166,13 +173,13 @@ variable "vault_secret" {
   default = {
     use_vault_provider        = true
     vault_kv_policy_name      = "kv-secret"
-    vault_kv_path             = "secret/data/openvscode"
+    vault_kv_path             = "secret/data/coder"
   }
 }
 
 variable "volume_destination" {
   description = "Specifies where the volume should be mounted inside the task"
   type        = string
-  default     = "/home/workspace"
+  default     = "/home/coder/"
 }
 
