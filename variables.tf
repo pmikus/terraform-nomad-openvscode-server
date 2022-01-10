@@ -61,16 +61,10 @@ variable "group_count" {
   default     = 1
 }
 
-variable "host" {
-  description = "Code Server host"
-  type        = string
-  default     = "127.0.0.1"
-}
-
 variable "image" {
   description = "The Docker image to run"
   type        = string
-  default     = "pmikus/docker-code-server-base:v3.12.0"
+  default     = "pmikus/docker-code-server-base:latest"
 }
 
 variable "job_name" {
@@ -165,15 +159,15 @@ variable "use_host_volume" {
 
 variable "vault_secret" {
   type = object({
-    use_vault_provider        = bool,
-    vault_kv_policy_name      = string,
-    vault_kv_path             = string
+    use_vault_provider   = bool,
+    vault_kv_policy_name = string,
+    vault_kv_path        = string
   })
   description = "Set of properties to be able to fetch secret from vault"
   default = {
-    use_vault_provider        = true
-    vault_kv_policy_name      = "kv-secret"
-    vault_kv_path             = "secret/data/coder"
+    use_vault_provider   = true
+    vault_kv_policy_name = "kv-secret"
+    vault_kv_path        = "secret/data/coder"
   }
 }
 
