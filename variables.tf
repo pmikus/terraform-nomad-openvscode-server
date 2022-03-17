@@ -52,7 +52,9 @@ variable "cpu" {
 variable "envs" {
   description = "Code Server environment variables"
   type        = list(string)
-  default     = []
+  default     = [
+    "PORT=8080"
+  ]
 }
 
 variable "group_count" {

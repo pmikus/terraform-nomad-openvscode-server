@@ -188,10 +188,9 @@ job "${job_name}" {
         data          = <<EOH
 auth: password
 password: ${password}
-cert: ${cert}
 EOH
       }
-      
+
       template {
         change_mode   = "noop"
         change_signal = "SIGINT"
@@ -215,7 +214,7 @@ EOH
 }
 EOH
       }
-      
+
       template {
         change_mode   = "noop"
         change_signal = "SIGINT"

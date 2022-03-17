@@ -21,7 +21,7 @@ module "code_server" {
   job_name        = "code-server"
   group_count     = 1
   password        = "28cc31eb07175f727e155ec8"
-  port_static     = 8443
+  port_static     = 8080
   service_name    = "coder"
   use_host_volume = true
   use_canary      = true
