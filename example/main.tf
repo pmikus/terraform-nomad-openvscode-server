@@ -17,7 +17,7 @@ module "code_server" {
 
   # code-server
   cert            = true
-  image           = "pmikus/docker-code-server-base:v4.0.1"
+  image           = "pmikus/docker-code-server-base:latest"
   job_name        = "code-server"
   group_count     = 1
   password        = "28cc31eb07175f727e155ec8"
